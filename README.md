@@ -1,6 +1,6 @@
-# tradaxs
+# tradaxs-mobile
 
-A new Flutter project.
+A cross platform crypto wallet and trading app.
 
 ## Getting Started
 
