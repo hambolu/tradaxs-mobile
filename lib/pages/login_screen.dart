@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'package:provider/provider.dart';
 import 'package:tradaxs/pages/register_screen.dart';
 import 'package:tradaxs/pages/wallet_screen.dart';
+import 'package:tradaxs/services/data/models/user_request_model.dart';
 import 'package:tradaxs/widgets/remember_me.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
 
+import '../services/providers/auth_provider.dart';
 import '../util/colors_class.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -17,23 +19,24 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String _password = '';
-
-  String _email = '';
+  UserRequestModel userRequestModel = UserRequestModel();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider auth = Provider.of<AuthProvider>(context);
+
     return SafeArea(
         child: Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(left: 20.0, right: 20.0),
         child: Column(children: <Widget>[
-          SizedBox(
+          const SizedBox(
             width: 200,
             height: 73,
           ),
           Align(
-              alignment: FractionalOffset(0.00, 0.9),
+              alignment: const FractionalOffset(0.00, 0.9),
               child: IconButton(
                 icon: const Icon(Icons.arrow_back_ios),
                 onPressed: () {
@@ -44,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 },
               )),
-          Align(
+          const Align(
               alignment: FractionalOffset(0.001, 0.9),
               child: Text(
                 "Let's sign you in",
@@ -54,10 +57,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Color.fromARGB(255, 0, 0, 0),
                     fontSize: 22),
               )),
-          SizedBox(
+          const SizedBox(
             height: 28,
           ),
-          Align(
+          const Align(
             alignment: FractionalOffset(0.001, 0.9),
             child: Text(
               'Welcome back, you’ve been missed!',
@@ -71,75 +74,99 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 1.7),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 38,
           ),
-          TextField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              labelText: 'Email',
-              hintText: 'Enter Your Email',
-            ),
-            onChanged: (value) {
-              _email = value;
-            },
-          ),
-          SizedBox(
-            height: 32,
-          ),
-          TextField(
-            obscureText: true,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              labelText: 'Password',
-              hintText: 'Enter Password',
-            ),
-            onChanged: (value) {
-              _password = value;
-            },
-          ),
-          SizedBox(
-            height: 30,
-          ),
-          RememberMe(),
-          SizedBox(
-            height: 30,
-          ),
-          Directionality(
-              textDirection: TextDirection.rtl,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorOne.cbuttons,
-                  shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(0.0),
+          Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      labelText: 'Email',
+                      hintText: 'Enter Your Email',
+                    ),
+                    onChanged: (value) {
+                      userRequestModel.email = value;
+                    },
                   ),
-                  minimumSize: const Size(200, 50),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Wallet()),
-                  );
-                },
-                icon: Icon(
-                  Icons.arrow_back_ios,
-                  size: 14,
-                ),
-                label: const Text(
-                  "Sign in",
-                  style: TextStyle(fontFamily: 'DM Sans'),
-                ),
-                //.........
+                  const SizedBox(
+                    height: 32,
+                  ),
+                  TextField(
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      labelText: 'Password',
+                      hintText: 'Enter Password',
+                    ),
+                    onChanged: (value) {
+                      userRequestModel.password = value;
+                    },
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                ],
               )),
-          SizedBox(
+          const RememberMe(),
+          const SizedBox(
+            height: 30,
+          ),
+          auth.loggedInStatus == Status.Authenticating
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const <Widget>[
+                    CircularProgressIndicator(),
+                    Text(" Login ... Please wait")
+                  ],
+                )
+              : Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorOne.cbuttons,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0.0),
+                      ),
+                      minimumSize: const Size(200, 50),
+                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        var login = auth.login(
+                          email: userRequestModel.email!,
+                          password: userRequestModel.password!,
+                        );
+                        if (auth.authenticated) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Wallet()),
+                          );
+                        } else {}
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back_ios,
+                      size: 14,
+                    ),
+                    label: const Text(
+                      "Sign in",
+                      style: TextStyle(fontFamily: 'DM Sans'),
+                    ),
+                    //.........
+                  )),
+          const SizedBox(
             height: 10,
           ),
-          Text('OR'),
-          SizedBox(
+          const Text('OR'),
+          const SizedBox(
             height: 10,
           ),
           SignInButton(
@@ -147,9 +174,9 @@ class _LoginScreenState extends State<LoginScreen> {
             text: "Continue with Google",
             onPressed: () {},
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text(
+            const Text(
               'Dont have an Account?',
               style: TextStyle(fontFamily: 'DM Sans'),
             ),
@@ -161,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         builder: (context) => const RegisterScreen()),
                   );
                 },
-                child: Text('Sign Up'))
+                child: const Text('Sign Up'))
           ])
         ]),
       ),
