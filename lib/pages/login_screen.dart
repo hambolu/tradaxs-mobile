@@ -144,12 +144,39 @@ class _LoginScreenState extends State<LoginScreen> {
                           password: userRequestModel.password!,
                         );
                         if (auth.authenticated) {
+                          SnackBar(
+                            content: Text(
+                              login.toString(),
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            action: SnackBarAction(
+                              label: "Dismiss",
+                              onPressed: () {
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
+                              },
+                            ),
+                          );
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => const Wallet()),
                           );
-                        } else {}
+                        } else {
+                          SnackBar(
+                            content: Text(
+                              login.toString(),
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            action: SnackBarAction(
+                              label: "Dismiss",
+                              onPressed: () {
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
+                              },
+                            ),
+                          );
+                        }
                       }
                     },
                     icon: const Icon(

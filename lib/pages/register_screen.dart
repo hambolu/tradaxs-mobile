@@ -164,12 +164,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           password: userRequestModel.password!,
                         );
                         if (auth.authenticated) {
+                          SnackBar(
+                            backgroundColor: Colors.blue,
+                            content: Text(
+                              login.toString(),
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            action: SnackBarAction(
+                              label: "Dismiss",
+                              onPressed: () {
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
+                              },
+                            ),
+                          );
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => const Wallet()),
                           );
-                        } else {}
+                        } else {
+                          SnackBar(
+                            backgroundColor: Colors.blue,
+                            content: Text(
+                              login.toString(),
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            action: SnackBarAction(
+                              label: "Dismiss",
+                              onPressed: () {
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
+                              },
+                            ),
+                          );
+                        }
                       }
                     },
                     icon: const Icon(
