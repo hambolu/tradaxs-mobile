@@ -145,6 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                         if (auth.authenticated) {
                           SnackBar(
+                            backgroundColor: Colors.blue,
                             content: Text(
                               login.toString(),
                               style: TextStyle(color: Colors.white),
@@ -164,6 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                         } else {
                           SnackBar(
+                            backgroundColor: Colors.blue,
                             content: Text(
                               login.toString(),
                               style: TextStyle(color: Colors.white),
