@@ -118,37 +118,63 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(
             height: 30,
           ),
-          auth.loggedInStatus == Status.Authenticating
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const <Widget>[
-                    CircularProgressIndicator(),
-                    Text(" Login ... Please wait")
-                  ],
-                )
-              : Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorOne.cbuttons,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0.0),
-                      ),
-                      minimumSize: const Size(200, 50),
+          if (auth.loggedInStatus == Status.Authenticating)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const <Widget>[
+                CircularProgressIndicator(),
+                Text(" Login ... Please wait")
+              ],
+            )
+          else
+            Directionality(
+                textDirection: TextDirection.rtl,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorOne.cbuttons,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0.0),
                     ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState!.save();
-                        var login = auth.login(
-                          email: userRequestModel.email!,
-                          password: userRequestModel.password!,
+                    minimumSize: const Size(200, 50),
+                  ),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save();
+                      var login = await auth.login(
+                        email: userRequestModel.email!,
+                        password: userRequestModel.password!,
+                      );
+                      print("THIS IS LOGIN SCREEN SUCCESS DATA :::::${login!}");
+
+                      if (auth.authenticated == true) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.blue,
+                            content: Text(
+                              login.toString(),
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            action: SnackBarAction(
+                              label: "Dismiss",
+                              onPressed: () {
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
+                              },
+                            ),
+                          ),
                         );
-                        if (auth.authenticated) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Wallet()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             backgroundColor: Colors.blue,
                             content: Text(
                               login.toString(),
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             ),
                             action: SnackBarAction(
                               label: "Dismiss",
@@ -157,40 +183,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                     .hideCurrentSnackBar();
                               },
                             ),
-                          );
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Wallet()),
-                          );
-                        } else {
-                          SnackBar(
-                            backgroundColor: Colors.blue,
-                            content: Text(
-                              login.toString(),
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            action: SnackBarAction(
-                              label: "Dismiss",
-                              onPressed: () {
-                                ScaffoldMessenger.of(context)
-                                    .hideCurrentSnackBar();
-                              },
-                            ),
-                          );
-                        }
+                          ),
+                        );
                       }
-                    },
-                    icon: const Icon(
-                      Icons.arrow_back_ios,
-                      size: 14,
-                    ),
-                    label: const Text(
-                      "Sign in",
-                      style: TextStyle(fontFamily: 'DM Sans'),
-                    ),
-                    //.........
-                  )),
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.arrow_back_ios,
+                    size: 14,
+                  ),
+                  label: const Text(
+                    "Sign in",
+                    style: TextStyle(fontFamily: 'DM Sans'),
+                  ),
+                  //.........
+                )),
           const SizedBox(
             height: 10,
           ),

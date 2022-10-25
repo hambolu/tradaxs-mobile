@@ -43,7 +43,7 @@ class AuthProvider extends ChangeNotifier {
     _registeredInStatus = value;
   }
 
-  Future<dynamic?> register({
+  Future<String?> register({
     required String email,
     required String password,
   }) async {
@@ -61,6 +61,7 @@ class AuthProvider extends ChangeNotifier {
       );
       print(response.statusCode);
       print(response.body);
+
       if (response.statusCode == 200) {
         print("Auth successful");
         print("This is Sign up response.body ${response.body}");
@@ -70,12 +71,14 @@ class AuthProvider extends ChangeNotifier {
         _registeredInStatus = Status.Registered;
         _authenticated = true;
         notifyListeners();
+        print("THIS IS Register SUCCSES RETURN RESPONSE ${message.message}");
         return message.message;
       } else {
         _registeredInStatus = Status.NotRegistered;
         _authenticated = false;
         notifyListeners();
         var res = userSignUpErrorResponseModelFromJson(response.body);
+        print("THIS IS REGISTER FAILURE RETURN RESPONSE ${res.message}");
         return res.message;
       }
     } on SocketException {
@@ -84,6 +87,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       throw "Check Internet Connection";
     } catch (e) {
+      print("THIS IS LOGIN SUCCSES RETURN RESPONSE ${e}");
       return e.toString();
     }
   }
@@ -92,7 +96,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<dynamic?> login({
+  Future<String?> login({
     required String email,
     required String password,
   }) async {
@@ -119,26 +123,36 @@ class AuthProvider extends ChangeNotifier {
         var message = userLoginResponseFromJson(response.body);
         UserPreferences().saveUserToken(res.token!);
         _loggedInStatus = Status.LoggedIn;
+        notifyListeners();
         _authenticated = true;
         notifyListeners();
+
+        print("THIS IS LOGIN SUCCSES RETURN RESPONSE ${message.message}");
         return message.message;
       } else {
         _loggedInStatus = Status.NotLoggedIn;
+        notifyListeners();
         _authenticated = false;
         notifyListeners();
         var res = userLoginResponseFromJson(response.body);
+
+        print("THIS IS LOGIN FAILURE RETURN RESPONSE ${res.message}");
         return res.message;
       }
     } on SocketException {
       _loggedInStatus = Status.NotLoggedIn;
+      notifyListeners();
       _authenticated = false;
       notifyListeners();
 
       throw "Check Internet Connection";
     } catch (e) {
       _loggedInStatus = Status.NotLoggedIn;
+      notifyListeners();
       _authenticated = false;
       notifyListeners();
+
+      print("THIS IS LOGIN SUCCSES RETURN RESPONSE ${e}");
       return e.toString();
     }
   }

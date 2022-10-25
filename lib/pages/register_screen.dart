@@ -143,7 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const <Widget>[
                     CircularProgressIndicator(),
-                    Text(" Login ... Please wait")
+                    Text(" Creating account  ... Please wait")
                   ],
                 )
               : Directionality(
@@ -159,23 +159,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        var login = auth.register(
+                        var login = await auth.register(
                           email: userRequestModel.email!,
                           password: userRequestModel.password!,
                         );
-                        if (auth.authenticated) {
-                          SnackBar(
-                            backgroundColor: Colors.blue,
-                            content: Text(
-                              login.toString(),
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            action: SnackBarAction(
-                              label: "Dismiss",
-                              onPressed: () {
-                                ScaffoldMessenger.of(context)
-                                    .hideCurrentSnackBar();
-                              },
+                        print(login);
+
+                        if (auth.authenticated == true) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.blue,
+                              content: Text(
+                                login.toString(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              action: SnackBarAction(
+                                label: "Dismiss",
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context)
+                                      .hideCurrentSnackBar();
+                                },
+                              ),
                             ),
                           );
                           Navigator.pushReplacement(
@@ -184,18 +188,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 builder: (context) => const Wallet()),
                           );
                         } else {
-                          SnackBar(
-                            backgroundColor: Colors.blue,
-                            content: Text(
-                              login.toString(),
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            action: SnackBarAction(
-                              label: "Dismiss",
-                              onPressed: () {
-                                ScaffoldMessenger.of(context)
-                                    .hideCurrentSnackBar();
-                              },
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.blue,
+                              content: Text(
+                                login.toString(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              action: SnackBarAction(
+                                label: "Dismiss",
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context)
+                                      .hideCurrentSnackBar();
+                                },
+                              ),
                             ),
                           );
                         }
@@ -209,8 +215,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       "Sign Up",
                       style: TextStyle(fontFamily: 'DM Sans'),
                     ),
-                    //.........
-                  )),
+                  ),
+                ),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             const Text(
               'Already have an Account?',
