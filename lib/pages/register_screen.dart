@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
 import 'package:tradaxs/pages/login_screen.dart';
-import 'package:tradaxs/pages/wallet_screen.dart';
+import 'package:tradaxs/pages/otp_screen.dart';
 
 import '../services/auth_service.dart';
 import '../services/data/models/user_request_model.dart';
@@ -185,7 +185,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Wallet()),
+                                builder: (context) => const OtpScreen()),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(

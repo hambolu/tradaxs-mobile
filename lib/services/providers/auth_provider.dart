@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../network/authp/utility/shared_preference.dart';
+import '../data/models/user_Otp_Model.dart';
 import '../data/models/user_login_model.dart';
 import '../data/models/user_signUp_error_model.dart';
 import '../data/models/user_signUp_success_model.dart';
@@ -153,6 +154,51 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
 
       print("THIS IS LOGIN SUCCSES RETURN RESPONSE ${e}");
+      return e.toString();
+    }
+  }
+
+  Future<String?> validateOtp(String otp) async {
+    String? userToken = await UserPreferences.getToken();
+    try {
+      final Map<String, dynamic> userOtp = {
+        "otp": otp,
+      };
+      _authenticated = false;
+      notifyListeners();
+      http.Response response = await http.post(
+        Uri.parse(
+            "https://tradaxs.com/tradaxs.com/mobile/api/otp/verification"),
+        headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader: "Bearer $userToken",
+        },
+        body: json.encode(userOtp),
+      );
+      if (response.statusCode == 200) {
+        print("OTP Validation successful");
+        print("This is OTP Validation response.body ${response.body}");
+        var res = userOtpModelFromJson(response.body);
+        var message = userOtpModelFromJson(response.body);
+
+        _authenticated = true;
+        notifyListeners();
+
+        print(
+            "THIS IS OTP Validation SUCCESS RETURN RESPONSE ${message.message}");
+        return message.message;
+      } else {
+        _authenticated = false;
+        notifyListeners();
+        var res = userOtpModelFromJson(response.body);
+
+        print("THIS IS LOGIN FAILURE RETURN RESPONSE ${res.message}");
+        return res.message;
+      }
+    } catch (e) {
+      _authenticated = false;
+      notifyListeners();
+      print("THIS IS LOGIN SUCCSES RETURN RESPONSE $e");
       return e.toString();
     }
   }
