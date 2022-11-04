@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:tradaxs/services/providers/wallet_provider.dart';
 
 import '../../network/authp/utility/shared_preference.dart';
 import '../data/models/user_Otp_Model.dart';
@@ -22,6 +23,7 @@ enum Status {
 }
 
 class AuthProvider extends ChangeNotifier {
+  WalletProvider walletProvider = WalletProvider();
   Status _loggedInStatus = Status.NotLoggedIn;
   Status _registeredInStatus = Status.NotRegistered;
   bool _authenticated = false;
@@ -70,10 +72,14 @@ class AuthProvider extends ChangeNotifier {
         var message = userSignUpSuccessResponseModelFromJson(response.body);
         UserPreferences().saveUserToken(res.token!);
         _registeredInStatus = Status.Registered;
+        String? createWallet =
+            await walletProvider.createWallet(token: res.token!);
+        await walletProvider.getWallet(token: res.token!);
         _authenticated = true;
         notifyListeners();
-        print("THIS IS Register SUCCSES RETURN RESPONSE ${message.message}");
-        return message.message;
+        print(
+            "THIS IS Register SUCCSES RETURN RESPONSE ${message.message! + createWallet!}");
+        return message.message! + createWallet!;
       } else {
         _registeredInStatus = Status.NotRegistered;
         _authenticated = false;
